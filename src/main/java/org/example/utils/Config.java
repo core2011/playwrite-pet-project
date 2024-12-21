@@ -5,16 +5,18 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Config {
-    private Properties properties;
+    private Properties prop = new Properties();
 
-    public Config() throws IOException {
-        properties = new Properties();
-        FileInputStream fileInputStream = new FileInputStream("application.properties");
-        properties.load(fileInputStream);
+    public Config() {
+        try (FileInputStream input = new FileInputStream("src/main/resources/application.properties")) {
+            prop.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public String getProperty(String key) {
-        return properties.getProperty(key);
+    public String getSiteUrl(String key) {
+        return prop.getProperty(key);
     }
 
 }

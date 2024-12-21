@@ -8,14 +8,12 @@ repositories {
 }
 
 dependencies {
+    implementation 'io.cucumber:cucumber-java:7.10.0'
     implementation 'com.microsoft.playwright:playwright:1.39.0'
     implementation 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    testImplementation 'io.cucumber:cucumber-java:7.10.0'
-    testImplementation 'io.cucumber:cucumber-spring:7.10.0'
-    testImplementation 'io.cucumber:cucumber-junit:7.10.0'
 }
 
 application {
@@ -28,5 +26,10 @@ test {
 
 tasks.withType(JavaExec) {
     jvmArgs = ['--enable-preview']
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
