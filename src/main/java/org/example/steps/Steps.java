@@ -5,6 +5,9 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.LoadState;
+import io.cucumber.java.After;
+import io.cucumber.java.BeforeAll;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -14,6 +17,8 @@ import org.example.pages.HomePage;
 import org.example.pages.PdpPage;
 import org.example.pages.PlpPage;
 import org.example.utils.Config;
+import org.example.utils.ScenarioContext;
+import org.example.utils.ScreenshotHook;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.Arrays;
@@ -25,6 +30,23 @@ public class Steps {
     private PlpPage plpPage;
     private PdpPage pdpPage;
     private CartPage cartPage;
+    private ScenarioContext context;
+
+    public Steps() {
+        context = new ScenarioContext();
+    }
+
+    @BeforeAll
+    public static void beforeAll() {
+        ScreenshotHook.cleanScreenshotsFolder();
+    }
+
+    @After
+    public void after(Scenario scenario) {
+        if (scenario.isFailed()) {
+            ScreenshotHook.takeScreenshot(this.page, scenario.getName());
+        }
+    }
 
     @Given("guest user on the home page")
     public void givenGuestUserOnHomePage() {
@@ -55,6 +77,7 @@ public class Steps {
 
     @Then("verify product name {string}")
     public void verifyProductName(String expectTextNameItem) {
+        context.setContext("itemName", expectTextNameItem);
         plpPage = new PlpPage(page);
         String actualTextProductName = plpPage.getTextProductName();
         Assertions.assertEquals(expectTextNameItem, actualTextProductName);
@@ -82,11 +105,29 @@ public class Steps {
     public void verifyUserOnTheCartPage() throws InterruptedException {
         cartPage = new CartPage(page);
         Thread.sleep(5000);
-//        Assertions.assertTrue(userOnCartPage);
+        boolean userOnCartPage = cartPage.verifyUserOnCartPage();
+        Assertions.assertTrue(userOnCartPage);
     }
 
     @When("scroll to the item on cart page")
     public void scrollToTheItemOnCartPage() {
         cartPage.scrollToElement();
+    }
+
+    @And("click on View Bag button")
+    public void clickOnViewBagButton() {
+        pdpPage.clickOnViewBagBtn();
+    }
+
+    @When("compare the selected item name with the cart item name")
+    public void compareTheSelectedItemNameWithTheCartItemName() {
+        String itemNameFromContext = context.getContext("itemName").toString();
+        String itemNameFromPage = cartPage.getFirstProductName();
+        Assertions.assertEquals(itemNameFromContext, itemNameFromPage );
+    }
+
+    @And("take screenshot cart")
+    public void takeScreenshotCart() {
+        ScreenshotHook.takeScreenshot(this.page,  "take screenshot cart step");
     }
 }

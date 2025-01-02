@@ -8,8 +8,11 @@ Feature: Search a product on the online store website ae.com
     Then click on the item and verify user on PDP page
     Then choose first not OOS size
     And click on Add to bag button
+    And click on View Bag button
     Then verify user on the cart page
     When scroll to the item on cart page
+    When compare the selected item name with the cart item name
+    And take screenshot cart
 
 
     Examples:
